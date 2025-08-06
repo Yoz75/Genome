@@ -17,7 +17,7 @@ public struct Simulation
 
         map.initMe();
 
-        renderer.createWindow(1300, 800, "wow!");
+        renderer.createWindow("wow!");
 
         for(int i = 0; i < gsic.xMapSize; i++)
         {

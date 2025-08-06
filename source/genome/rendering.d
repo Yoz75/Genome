@@ -47,11 +47,12 @@ struct Renderer
 
     /// Create window
     /// Params:
-    ///   width = window width
-    ///   height = window height
     ///   title = window title
-    public void createWindow(int width, int height, string title)
+    public void createWindow(string title)
     {
+        immutable int width = GetScreenWidth();
+        immutable int height = GetScreenHeight();
+        SetConfigFlags(ConfigFlags.FLAG_FULLSCREEN_MODE);
         InitWindow(width, height, title.ptr);
 
         SimScreen = GenImageColor(gsic.xMapSize, gsic.yMapSize, Colors.BLACK);
