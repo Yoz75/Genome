@@ -3,19 +3,19 @@ import genome.settings.attributes;
 import jsonizer;
 
 /// Global spawn config
-SpawnConfig GlobalSpawnConfig;
+SpawnConfig globalSpawnConfig;
 /// Global agent config
-AgentConfig GlobalAgentConfig;
+AgentConfig globalAgentConfig;
 /// Global simulation config
-SimulationConfig GlobalSimulationConfig;
+SimulationConfig globalSimulationConfig;
 /// Global rendering config
-RenderingConfig GlobalRenderingConfig;
+RenderingConfig globalRenderingConfig;
 
 /// Alias for GlobalSpawnConfig to avoid long names in code.
-alias gsc = GlobalSpawnConfig;
-alias gat = GlobalAgentConfig;
-alias gsic = GlobalSimulationConfig;
-alias grc = GlobalRenderingConfig;
+alias gsc = globalSpawnConfig;
+alias gat = globalAgentConfig;
+alias gsic = globalSimulationConfig;
+alias grc = globalRenderingConfig;
 
 /// Related to spawning settings
 struct SpawnConfig
