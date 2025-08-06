@@ -1,0 +1,29 @@
+{
+	"authors": [
+		"yoz75"
+	],
+	"copyright": "Copyright © 2025, yoz75",
+	"dependencies": {
+		"colorize": "~>1.0.5",
+		"jsonizer": "~>0.7.7",
+		"raylib-d": "~>5.5.1"
+	},
+	"description": "A simple life simulation using genome",
+	"lflags-linux": [
+		"-rpath=$$ORIGIN"
+	],
+	"lflags-osx": [
+		"-rpath",
+		"@executable_path/"
+	],
+	"lflags-posix": [
+		"-L."
+	],
+	"libs": [
+		"raylib"
+	],
+	"license": "MIT",
+	"name": "genome",
+	"targetPath": "./bin",
+	"workingDirectory": "./bin"
+}
