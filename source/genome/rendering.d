@@ -59,7 +59,7 @@ struct Renderer
         }
         else if(grc.renderMode == RenderMode.borderless)
         {
-            SetConfigFlags(ConfigFlags.FLAG_WINDOW_UNDECORATED );
+            SetConfigFlags(ConfigFlags.FLAG_WINDOW_UNDECORATED);
         }
         else
         {
