@@ -11,7 +11,7 @@ public class UpdateConfigSystem : BaseSystem
     
     public override void update()
     {
-        if(!Input.IsKeyDown(Keys.r)) return;
+        if(!Input.IsKeyDown(Keys.q)) return;
 
         configManager.updateConfigs();
     }
