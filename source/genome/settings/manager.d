@@ -92,6 +92,7 @@ public struct ConfigManager
         LoadConfigWithFeedback!(SpawnConfig, gsc)(spawnConfigPath);
         LoadConfigWithFeedback!(AgentConfig, gat)(agentConfigPath);
         LoadConfigWithFeedback!(SimulationConfig, gsic)(simulationConfigPath);
+        LoadConfigWithFeedback!(RenderingConfig, grc)(renderingConfigPath);
 
         if(AskAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)"))
             AskAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
