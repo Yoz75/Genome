@@ -2,6 +2,7 @@ module genome.simobject;
 
 import genome.map : map;
 import genome.settings.config;
+import genome.simulation : Simulation;
 import std.bitmanip;
 
 /// List of all systems in the simulation
@@ -156,7 +157,7 @@ public abstract class BaseSystem
     protected mixin template CreateMethod(TSelf)
     {
         /// Called when system instance is created trough create method of CreateMethod mixin
-
+        import genome.simulation : Simulation;
         public static TSelf create()
         {
             auto system = new TSelf();
@@ -168,6 +169,10 @@ public abstract class BaseSystem
             return system;
         }
     }
+
+    /// Current simulation pointer (for some functions, e.g. restarting etc) 
+    ///(at some reason I can't declare ref field with D 2.111 :\)
+    public Simulation* simulation;
 
     /// Update system for each component
     public abstract void update();

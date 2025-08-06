@@ -16,3 +16,31 @@ public class UpdateConfigSystem : BaseSystem
         configManager.updateConfigs();
     }
 }
+
+@AddAtStart
+public class RestartSimulationSystem : BaseSystem
+{
+    mixin CreateMethod!RestartSimulationSystem;
+
+    public override void update()
+    {
+        if(!Input.IsKeyDown(Keys.r)) return;
+
+        simulation.restart();
+    }
+}
+
+@AddAtStart
+public class ExitSimulationSystem : BaseSystem
+{
+    mixin CreateMethod!ExitSimulationSystem;
+
+    public override void update()
+    {
+        import core.stdc.stdlib : exit;
+
+        if(!Input.IsKeyDown(Keys.escape)) return;
+
+        exit(0);
+    }
+}

@@ -9,6 +9,8 @@ import std.traits;
 /// Genome simulation
 public struct Simulation
 {
+    private bool shouldRestart;
+
     /// Run the Genome
     public void run()
     {
@@ -19,21 +21,32 @@ public struct Simulation
 
         renderer.createWindow("wow!");
 
-        for(int i = 0; i < gsic.xMapSize; i++)
+        while(!renderer.shouldEndDrawing())
         {
-            for(int j = 0; j < gsic.xMapSize; j++)
+            shouldRestart = false;
+            for(int i = 0; i < gsic.xMapSize; i++)
             {
-                auto object = map.getAtPosition([j, i]);
+                for(int j = 0; j < gsic.xMapSize; j++)
+                {
+                    auto object = map.getAtPosition([j, i]);
 
-                Renderable renderable;
-                renderable.color = Color(0, 0, 0);
+                    Renderable renderable;
+                    renderable.color = Color(0, 0, 0);
 
-                object.addComponent!Renderable(renderable);
+                    object.addComponent!Renderable(renderable);
+                }
             }
-        }
 
-        addSystems();
-        while(!renderer.shouldEndDrawing()) update;
+            addSystems();
+            while(!shouldRestart) update;
+        }
+    }
+
+    /// Fully restart current simulation
+    public void restart()
+    {
+        systems.length = 0;
+        shouldRestart = true;
     }
 
     private void update()
@@ -65,7 +78,7 @@ public struct Simulation
 
         static foreach (i, attributed; getSymbolsByUDA!(moduleName, AddAtStart))
         {            
-            attributed.create();            
+            attributed.create().simulation = &this;            
         }
     }
 }
