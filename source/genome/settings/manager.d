@@ -28,10 +28,11 @@ private T ReadWithPrompt(T)(dstring prompt)
 /// Params:
 ///   prompt = text prompt
 ///   yesAnswer = user "yes" answer
-private void AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, dstring yesAnswer = "y"d)
+/// Returns: true if user answered yesAnswer, false in other case
+private bool AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, dstring yesAnswer = "y"d)
 {
     bool wantRedactConfig = ReadWithPrompt!dstring(prompt) == yesAnswer;
-    if(!wantRedactConfig) return;
+    if(!wantRedactConfig) return false;
     
     import std.traits : hasUDA, getUDAs;
     static foreach (i, name; FieldNameTuple!TConfig)
@@ -56,6 +57,8 @@ private void AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, d
             }
         }
     }    
+
+    return true;
 }
 
 /// Ask user about config saving (save config if user answer == yesAnswer)
@@ -90,17 +93,17 @@ public struct ConfigManager
         LoadConfigWithFeedback!(AgentConfig, gat)(agentConfigPath);
         LoadConfigWithFeedback!(SimulationConfig, gsic)(simulationConfigPath);
 
-        AskAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)");
-        AskAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
+        if(AskAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)"))
+            AskAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
 
-        AskAboutEditConfig!(AgentConfig, gat)("Do you want to edit agent config? (y/n)");
-        AskAboutSaveConfig!(AgentConfig, gat)(agentConfigPath, "Do you want to save config? (y/n)");
+        if(AskAboutEditConfig!(AgentConfig, gat)("Do you want to edit agent config? (y/n)"))
+            AskAboutSaveConfig!(AgentConfig, gat)(agentConfigPath, "Do you want to save config? (y/n)");
 
-        AskAboutEditConfig!(SimulationConfig, gsic)("Do you want to edit simulation config? (y/n)");
-        AskAboutSaveConfig!(SimulationConfig, gsic)(simulationConfigPath, "Do you want to save config? (y/n)");
+        if(AskAboutEditConfig!(SimulationConfig, gsic)("Do you want to edit simulation config? (y/n)"))
+            AskAboutSaveConfig!(SimulationConfig, gsic)(simulationConfigPath, "Do you want to save config? (y/n)");
 
-        AskAboutEditConfig!(RenderingConfig, grc)("Do you want to edit rendering config? (y/n)");
-        AskAboutSaveConfig!(RenderingConfig, grc)(renderingConfigPath, "Do you want to save config? (y/n)");
+        if(AskAboutEditConfig!(RenderingConfig, grc)("Do you want to edit rendering config? (y/n)"))
+            AskAboutSaveConfig!(RenderingConfig, grc)(renderingConfigPath, "Do you want to save config? (y/n)");
     }
 
     public void updateConfigs()
