@@ -8,11 +8,14 @@ SpawnConfig GlobalSpawnConfig;
 AgentConfig GlobalAgentConfig;
 /// Global simulation config
 SimulationConfig GlobalSimulationConfig;
+/// Global rendering config
+RenderingConfig GlobalRenderingConfig;
 
 /// Alias for GlobalSpawnConfig to avoid long names in code.
 alias gsc = GlobalSpawnConfig;
 alias gat = GlobalAgentConfig;
 alias gsic = GlobalSimulationConfig;
+alias grc = GlobalRenderingConfig;
 
 /// Related to spawning settings
 struct SpawnConfig
@@ -57,4 +60,17 @@ struct SimulationConfig
 @jsonize:
     @AskUser("x map size"d) int xMapSize = 512;
     @AskUser("y map size"d) int yMapSize = 512;
+}
+
+enum RenderMode
+{
+    fullscreen,
+    borderless
+}
+struct RenderingConfig
+{
+    mixin JsonizeMe;
+@jsonize:
+    @AskUser("window render mode (fullscreen/borderless)")
+     RenderMode renderMode = RenderMode.fullscreen;
 }

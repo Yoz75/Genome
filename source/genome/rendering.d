@@ -52,7 +52,19 @@ struct Renderer
     {
         immutable int width = GetScreenWidth();
         immutable int height = GetScreenHeight();
-        SetConfigFlags(ConfigFlags.FLAG_FULLSCREEN_MODE);
+
+        if(grc.renderMode == RenderMode.fullscreen)
+        {
+            SetConfigFlags(ConfigFlags.FLAG_FULLSCREEN_MODE);
+        }
+        else if(grc.renderMode == RenderMode.borderless)
+        {
+            SetConfigFlags(ConfigFlags.FLAG_WINDOW_UNDECORATED );
+        }
+        else
+        {
+            throw new Exception("Unknown render mode!");
+        }
         InitWindow(width, height, title.ptr);
 
         SimScreen = GenImageColor(gsic.xMapSize, gsic.yMapSize, Colors.BLACK);
