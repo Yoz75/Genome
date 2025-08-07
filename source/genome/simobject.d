@@ -177,6 +177,16 @@ public abstract class BaseSystem
     /// Update system for each component
     public abstract void update();
 
+    public void destroy()
+    {
+        onDestroyed();
+    }
+
+    protected void onDestroyed()
+    {
+        //nothing here
+    }
+
     public void onCreated()
     {
         //nothing here
@@ -209,6 +219,12 @@ public abstract class System(T) : BaseSystem
                 if(object.hasComponent!T()) updateComponent(object.getComponent!T(), object);
             }
         }
+    }
+    
+    protected override void onDestroyed()
+    {
+        ComponentPool!T.instance.data.length = 0;
+        ComponentPool!T.instance.entitiesHasTable.length = 0;
     }
 
     /// Update component

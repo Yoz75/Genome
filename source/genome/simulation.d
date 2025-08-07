@@ -17,12 +17,11 @@ public struct Simulation
         import genome.food;
         import std.random;
 
-        map.initMe();
-
         renderer.createWindow("wow!");
 
         while(!renderer.shouldEndDrawing())
         {
+            map.initMe();
             shouldRestart = false;
             for(int i = 0; i < gsic.xMapSize; i++)
             {
@@ -45,6 +44,11 @@ public struct Simulation
     /// Fully restart current simulation
     public void restart()
     {
+        foreach(system; systems)
+        {
+            system.destroy();
+        }
+
         systems.length = 0;
         shouldRestart = true;
     }
