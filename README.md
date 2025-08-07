@@ -1,4 +1,5 @@
 # Genome
+<img width="1295" height="876" alt="изображение" src="https://github.com/user-attachments/assets/9e615152-cc59-49a9-b1ef-c27cffebcca5" />
 <img width="832" height="828" src="https://github.com/user-attachments/assets/3ec8f9ad-8147-40e4-a0f6-0232c6f061f8" />
 <img width="976" height="885" src="https://github.com/user-attachments/assets/f117922f-9dae-4d60-9f62-fd5213dd7da2" />
 <img width="1120" height="824" src="https://github.com/user-attachments/assets/6277bbde-a9de-4a0c-8c7e-c3727ecd02fe" />
