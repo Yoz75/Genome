@@ -19,6 +19,7 @@ Yellow tiles are agents. Green tiles are food. Gray tiles are spikes.
 WASD or mouse -- move<br>
 Q --  reload configuration (you can edit values in the config manager)<br>
 R -- restart the simulation<br>
+T -- make agents dump<br>
 Escape -- exit the simulation
 
 # Building
