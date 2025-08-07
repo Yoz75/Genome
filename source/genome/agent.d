@@ -42,7 +42,18 @@ public enum Instruction : NumericInstruction
     /// ditto
     jumpEquals,
     /// ditto
-    jumpLess
+    jumpLess,
+    /// Look at an object at relative position (same as walk and eat) and to the register it's type 
+    /// (based on LookCommandObjects enum)
+    look
+}
+
+private enum LookCommandObjects
+{
+    nothing = 0,
+    food,
+    spike,
+    agent
 }
 
 public struct Flags
@@ -356,6 +367,23 @@ public class AgentSystem : ObjectSystem!Agent
                 case Instruction.jumpLess:
                     // ditto
                     pc = agent.genome[addPC(cast(int) agent.flags.getLess)];
+                    break;
+
+                case Instruction.look:
+                    int[2] position;
+                    position[0] = cast(int) agent.genome[addPC(1)];
+                    position[1] = cast(int) agent.genome[addPC(1)];
+
+                    int[2] relativePosition;
+                    relativePosition[] = position[] % 3;
+
+                    SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
+
+                    if(other.hasComponent!Agent()) agent.register = LookCommandObjects.agent;
+                    else if(other.hasComponent!Food()) agent.register = LookCommandObjects.food;
+                    else if(other.hasComponent!Spike()) agent.register = LookCommandObjects.spike;
+                    else agent.register = LookCommandObjects.agent;
+
                     break;
 
                 default:
