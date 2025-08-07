@@ -28,6 +28,11 @@ Escape -- exit the simulation
 * You need a D compiler, that supports D 2.111, I like to use ldc2, so this project uses ldc2 compiler by default (see --compiler=ldc2 in .bat files). If you prefer dmd or gdc, simply replace ldc2 with the appropriate compiler in the scripts.<br>
 * Also, Genome uses raylib. There is already raylib.dll file inside project folder and build.bat and buildr.bat automatically move library to bin folder. If you use Linux, you have to add library yourself.
 
+### DUB packages:
+* colorize
+* jsonizer
+* raylib-d
+
 On Windows:
 * build.bat -- build in debug mode
 * buildr.bat -- build in release mode
