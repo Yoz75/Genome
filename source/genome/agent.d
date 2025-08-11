@@ -93,7 +93,9 @@ public struct Agent
     Flags flags;    
     
     /// Agent's genome
-    Array!(Instruction, 64) genome; // 64 is default genome size
+    // 64 is the default genome size, but we set 65 because at some reason dynamic allocations begin
+    // even if the static storage size == genome size
+    Array!(Instruction, 65) genome; 
 }
 
 @AddAtStart
@@ -165,7 +167,7 @@ public class AgentSystem : ObjectSystem!Agent
             object.removeComponent!Agent();
             return;
         }
-        
+
         executeGenome(agent, object);
     }
 
@@ -178,7 +180,7 @@ public class AgentSystem : ObjectSystem!Agent
             int maxInstruction = gat.maxInstructionValue;
             if(maxInstruction < 1) maxInstruction = Instruction.max + 1;
                         
-            int index = uniform(0, maxInstruction);
+            int index = uniform(0, cast(int) agent.genome.length);
             agent.genome[index] = cast(Instruction) uniform(0, maxInstruction);
         }
     }
@@ -282,7 +284,9 @@ public class AgentSystem : ObjectSystem!Agent
                             child.pc = childPC;
 
                             foreach(j; 0..gat.genomeSize)
+                            {
                                child.genome ~= agent.genome[j];
+                            }
                             
                             mutate(child);
 
@@ -300,7 +304,6 @@ public class AgentSystem : ObjectSystem!Agent
                 case Instruction.set:
                     NumericInstruction address = agent.genome[addPC(1)]  % agent.genome.length;
                     NumericInstruction value = agent.genome[addPC(1)];
-                    
                     agent.genome[address] = cast(Instruction) value;
                     break;
                 
@@ -327,7 +330,7 @@ public class AgentSystem : ObjectSystem!Agent
                     tryRemoveAndAddEnergy!Agent(gat.cannibalismEnergy);
                     tryRemoveAndAddEnergy!Food(gat.foodEnergy);
                     tryRemoveAndAddEnergy!Spike(-gat.spikeEnergyDamage);
-                    break;
+                    return;
                 
                 case Instruction.compare:
                     NumericInstruction value = agent.genome[addPC(1)];
