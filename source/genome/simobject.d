@@ -248,12 +248,19 @@ public abstract class ObjectSystem(T) : System!(T)
     public final override void onRemove(SimObject object)
     {
         object.getComponent!Renderable.color = Color(0, 0, 0);
+        cleanUp(object);
     }
 
     protected final override void updateComponent(ref T component, SimObject object)
     {
         object.getComponent!Renderable().color = color;
         updateObject(component, object);
+    }
+
+    /// calls in onRemove
+    protected void cleanUp(SimObject)
+    {
+        //nothing
     }
 
     protected abstract void updateObject(ref T component, SimObject object);

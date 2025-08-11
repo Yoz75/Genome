@@ -8,6 +8,7 @@ import genome.spike;
 import genome.settings.config;
 import std.random;
 import std.range;
+import dlib.container.array;
 
 alias NumericInstruction = ubyte;
 
@@ -92,7 +93,7 @@ public struct Agent
     Flags flags;    
     
     /// Agent's genome
-    Instruction[] genome;
+    Array!(Instruction, 64) genome; // 64 is default genome size
 }
 
 @AddAtStart
@@ -111,15 +112,15 @@ public class SpawnAgentSystem : BaseSystem
                 if (!object.hasComponent!Agent() && uniform01() <= gsc.agentSpawnFrequency * baseSpawnFrequency)
                 {
                     Agent agent;
-                    agent.genome = new Instruction[gat.genomeSize];
+                    agent.genome.reserve(gat.genomeSize);
 
-                    foreach(ref Instruction instruction; agent.genome)
+                    foreach(i; 0..gat.genomeSize)
                     {
                         int maxInstruction = gat.maxInstructionValue;
                         if(maxInstruction < 1) maxInstruction = Instruction.max + 1;
 
                         auto raw = uniform(0, maxInstruction);
-                        instruction = cast(Instruction) raw;
+                        agent.genome ~= cast(Instruction) raw;
                     }
 
                     agent.energy = gat.baseEnergy;
@@ -146,6 +147,11 @@ public class AgentSystem : ObjectSystem!Agent
     public this()
     {
         color = agentColor;
+    }
+
+    protected override void cleanUp(SimObject object)
+    {
+        object.getComponent!Agent().genome.free();
     }
 
     public override void updateObject(ref Agent agent, SimObject object)
@@ -178,8 +184,7 @@ public class AgentSystem : ObjectSystem!Agent
     }
 
     private void executeGenome(ref Agent agent, SimObject object)
-    {
-        
+    {        
         ref int pc = agent.pc;
 
         void boundPC()
@@ -266,16 +271,18 @@ public class AgentSystem : ObjectSystem!Agent
                         
                             agent.energy /= 2;
 
-                            Agent child = agent;
+                            //We can't copy parent because child's genome could have references on the same storage
+                            //(if genome size > 64). Then we should set child's genome init value and copy parent's values
+                            //in it, but that's too unoptimized. Just copy genome is simpler
+                            Agent child;
+                            child.energy = agent.energy;
+                            child.flags = agent.flags;
+                            child.register = agent.register;
+                            child.genome.reserve(gat.genomeSize);
                             child.pc = childPC;
 
-                            if(gat.genomeSize <= agent.genome.length)
-                                child.genome = agent.genome.dup[0..gat.genomeSize];
-                            else
-                            {
-                                child.genome = new Instruction[gat.genomeSize];
-                                child.genome[0..gat.genomeSize] = agent.genome;
-                            }
+                            foreach(j; 0..gat.genomeSize)
+                               child.genome ~= agent.genome[j];
                             
                             mutate(child);
 

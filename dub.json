@@ -5,6 +5,7 @@
 	"copyright": "Copyright © 2025, yoz75",
 	"dependencies": {
 		"colorize": "~>1.0.5",
+		"dlib": "~>1.3.2",
 		"jsonizer": "~>0.7.7",
 		"raylib-d": "~>5.5.1"
 	},
@@ -25,5 +26,6 @@
 	"license": "MIT",
 	"name": "genome",
 	"targetPath": "./bin",
-	"workingDirectory": "./bin"
+	"workingDirectory": "./bin",
+	"dflags": ["--vgc"]
 }
