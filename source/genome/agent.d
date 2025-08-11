@@ -185,7 +185,7 @@ public class AgentSystem : ObjectSystem!Agent
         void boundPC()
         {
             if(pc < 0) pc = 0;
-            if(pc >= gat.genomeSize) pc %= gat.genomeSize;
+            pc %= gat.genomeSize;
         }
 
         /// Add program counter and return its new value
