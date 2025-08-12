@@ -39,6 +39,7 @@ public struct ComponentPool(T)
     public void removeComponent(SimObject entity)
     {
         tryExtendData(entity);
+        data[entity.id] = T.init;
         entitiesHasTable[entity.id] = false;
 
         foreach (onRemove; onRemoveDelegates)
@@ -223,7 +224,6 @@ public abstract class System(T) : BaseSystem
     
     protected override void onDestroyed()
     {
-        ComponentPool!T.instance.data.length = 0;
         ComponentPool!T.instance.entitiesHasTable.length = 0;
     }
 
