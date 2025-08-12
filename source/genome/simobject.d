@@ -209,8 +209,6 @@ public abstract class System(T) : BaseSystem
 
     public override void update()
     {
-        auto pool = ComponentPool!T.instance;
-
         foreach (int y; 0 .. gsic.yMapSize)
         {
             foreach (int x; 0 .. gsic.xMapSize)
