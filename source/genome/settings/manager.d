@@ -82,7 +82,6 @@ public struct ConfigManager
     private enum spawnConfigPath = configsPath ~ "spawn.json";
     private enum agentConfigPath = configsPath ~ "agent.json";
     private enum simulationConfigPath = configsPath ~ "simulation.json";
-    private enum renderingConfigPath = configsPath ~ "rendering.json";
 
     /// Run Config Manager
     public void run()
@@ -92,7 +91,6 @@ public struct ConfigManager
         LoadConfigWithFeedback!(SpawnConfig, gsc)(spawnConfigPath);
         LoadConfigWithFeedback!(AgentConfig, gat)(agentConfigPath);
         LoadConfigWithFeedback!(SimulationConfig, gsic)(simulationConfigPath);
-        LoadConfigWithFeedback!(RenderingConfig, grc)(renderingConfigPath);
 
         if(AskAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)"))
             AskAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
@@ -102,9 +100,6 @@ public struct ConfigManager
 
         if(AskAboutEditConfig!(SimulationConfig, gsic)("Do you want to edit simulation config? (y/n)"))
             AskAboutSaveConfig!(SimulationConfig, gsic)(simulationConfigPath, "Do you want to save config? (y/n)");
-
-        if(AskAboutEditConfig!(RenderingConfig, grc)("Do you want to edit rendering config? (y/n)"))
-            AskAboutSaveConfig!(RenderingConfig, grc)(renderingConfigPath, "Do you want to save config? (y/n)");
     }
 
     public void updateConfigs()

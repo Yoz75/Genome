@@ -8,14 +8,11 @@ SpawnConfig globalSpawnConfig;
 AgentConfig globalAgentConfig;
 /// Global simulation config
 SimulationConfig globalSimulationConfig;
-/// Global rendering config
-RenderingConfig globalRenderingConfig;
 
 /// Alias for GlobalSpawnConfig to avoid long names in code.
 alias gsc = globalSpawnConfig;
 alias gat = globalAgentConfig;
 alias gsic = globalSimulationConfig;
-alias grc = globalRenderingConfig;
 
 /// Related to spawning settings
 struct SpawnConfig
@@ -66,11 +63,4 @@ enum RenderMode
 {
     fullscreen,
     borderless
-}
-struct RenderingConfig
-{
-    mixin JsonizeMe;
-@jsonize:
-    @AskUser("window render mode (fullscreen/borderless)")
-     RenderMode renderMode = RenderMode.fullscreen;
 }
