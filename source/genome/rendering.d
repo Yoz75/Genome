@@ -45,6 +45,9 @@ struct Renderer
     private Image simScreen;
     private Texture2D simScreenTexture;
 
+    //Idk how to name it
+    private float requestedZoom;
+
     /// Create window
     /// Params:
     ///   title = window title
@@ -63,6 +66,8 @@ struct Renderer
         camera.offset = Vector2(width / 2, height / 2);
         camera.rotation = 0;
         camera.zoom = 1.0f;
+
+        requestedZoom = 0;
     }
 
     public void setColor(int[2] position, Color color)
@@ -72,7 +77,8 @@ struct Renderer
 
     public void update()
     {
-        enum float zoomMultiplier = 0.1;
+        enum float totalZoomMultiplier = 0.075;
+        enum float addZoom = 0.035;
         enum float minimalZoom = 0.1;
         
         float wheel = GetMouseWheelMove();
@@ -82,10 +88,29 @@ struct Renderer
             camera.offset = GetMousePosition();
             camera.target = mouseWorldPos;
             
-            camera.zoom += wheel * zoomMultiplier;
+            float zoom = wheel * totalZoomMultiplier;
 
-            if (camera.zoom < minimalZoom) camera.zoom = minimalZoom;
+            requestedZoom += zoom;            
         }
+
+        import std.stdio; writeln(requestedZoom);
+
+        if(requestedZoom > 0)
+        {
+            requestedZoom -= addZoom;
+            camera.zoom += addZoom;
+
+            if(requestedZoom - addZoom < 0) requestedZoom = 0;
+        }
+        else if(requestedZoom < 0)
+        {
+            requestedZoom += addZoom;
+            camera.zoom -= addZoom;
+
+            if(requestedZoom + addZoom > 0) requestedZoom = 0;
+        }
+
+        if (camera.zoom < minimalZoom) camera.zoom = minimalZoom;
 
         immutable float moveSpeed = 100.0f * GetFrameTime() / camera.zoom;
         if (Input.IsKeyDown(Keys.w)) camera.target.y -= moveSpeed;
