@@ -41,9 +41,9 @@ struct Renderer
 {
     import raylib;
 
-    private Camera2D Camera;
-    private Image SimScreen;
-    private Texture2D SimScreenTexture;
+    private Camera2D camera;
+    private Image simScreen;
+    private Texture2D simScreenTexture;
 
     /// Create window
     /// Params:
@@ -56,18 +56,18 @@ struct Renderer
         SetConfigFlags(ConfigFlags.FLAG_WINDOW_UNDECORATED);
         InitWindow(width, height, title.ptr);
 
-        SimScreen = GenImageColor(gsic.xMapSize, gsic.yMapSize, Colors.BLACK);
-        SimScreenTexture = LoadTextureFromImage(SimScreen);
+        simScreen = GenImageColor(gsic.xMapSize, gsic.yMapSize, Colors.BLACK);
+        simScreenTexture = LoadTextureFromImage(simScreen);
 
-        Camera.target = Vector2(0, 0);
-        Camera.offset = Vector2(width / 2, height / 2);
-        Camera.rotation = 0;
-        Camera.zoom = 1.0f;
+        camera.target = Vector2(0, 0);
+        camera.offset = Vector2(width / 2, height / 2);
+        camera.rotation = 0;
+        camera.zoom = 1.0f;
     }
 
     public void setColor(int[2] position, Color color)
     {
-        ImageDrawPixel(&SimScreen, position[0], position[1], cast(raylib.Color) color);
+        ImageDrawPixel(&simScreen, position[0], position[1], cast(raylib.Color) color);
     }
 
     public void update()
@@ -78,27 +78,27 @@ struct Renderer
         float wheel = GetMouseWheelMove();
         if (wheel != 0)
         {
-            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), Camera);
-            Camera.offset = GetMousePosition();
-            Camera.target = mouseWorldPos;
+            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+            camera.offset = GetMousePosition();
+            camera.target = mouseWorldPos;
             
-            Camera.zoom += wheel * zoomMultiplier;
+            camera.zoom += wheel * zoomMultiplier;
 
-            if (Camera.zoom < minimalZoom) Camera.zoom = minimalZoom;
+            if (camera.zoom < minimalZoom) camera.zoom = minimalZoom;
         }
 
-        immutable float moveSpeed = 100.0f * GetFrameTime() / Camera.zoom;
-        if (Input.IsKeyDown(Keys.w)) Camera.target.y -= moveSpeed;
-        if (Input.IsKeyDown(Keys.s)) Camera.target.y += moveSpeed;
-        if (Input.IsKeyDown(Keys.a)) Camera.target.x -= moveSpeed;
-        if (Input.IsKeyDown(Keys.d)) Camera.target.x += moveSpeed;
+        immutable float moveSpeed = 100.0f * GetFrameTime() / camera.zoom;
+        if (Input.IsKeyDown(Keys.w)) camera.target.y -= moveSpeed;
+        if (Input.IsKeyDown(Keys.s)) camera.target.y += moveSpeed;
+        if (Input.IsKeyDown(Keys.a)) camera.target.x -= moveSpeed;
+        if (Input.IsKeyDown(Keys.d)) camera.target.x += moveSpeed;
 
         BeginDrawing();
         ClearBackground(Colors.BLACK);
-        BeginMode2D(Camera);
+        BeginMode2D(camera);
 
-        UpdateTexture(SimScreenTexture, SimScreen.data);
-        DrawTexture(SimScreenTexture, 0, 0, Colors.RAYWHITE);     
+        UpdateTexture(simScreenTexture, simScreen.data);
+        DrawTexture(simScreenTexture, 0, 0, Colors.RAYWHITE);     
 
         EndMode2D();
         EndDrawing();     
