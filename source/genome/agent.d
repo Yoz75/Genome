@@ -349,7 +349,7 @@ public class AgentSystem : ObjectSystem!Agent
                     {
                         agent.flags.setEquals(true);
                     }
-                    else if(result < value)
+                    else
                     {
                         agent.flags.setLess(true);
                     }
