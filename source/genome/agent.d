@@ -159,8 +159,6 @@ public class AgentSystem : ObjectSystem!Agent
 
     public override void updateObject(ref Agent agent, SimObject object)
     {
-        enum float energyClamp = 0.1;
-        if(agent.energy < energyClamp) agent.energy = energyClamp;
         agent.energy -= gat.starveEnergy;
 
         if(agent.energy <= 0) 
