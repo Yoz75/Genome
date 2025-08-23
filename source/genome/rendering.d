@@ -93,8 +93,6 @@ struct Renderer
             requestedZoom += zoom;            
         }
 
-        import std.stdio; writeln(requestedZoom);
-
         if(requestedZoom > 0)
         {
             requestedZoom -= addZoom;
