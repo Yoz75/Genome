@@ -151,6 +151,7 @@ public class AgentSystem : ObjectSystem!Agent
         color = agentColor;
     }
 
+
     protected override void cleanUp(SimObject object)
     {
         object.getComponent!Agent().genome.free();
@@ -207,6 +208,128 @@ public class AgentSystem : ObjectSystem!Agent
             return pc;
         }
 
+        /*
+            A LOT OF FUNCTIONS BELOW.
+            EACH FUNCTION IS A COMMAND.
+        */
+
+        void divide()
+        {
+            NumericInstruction childPC = agent.genome[addPC(1)];
+
+            auto neighbors = map.getNeighbors(object);
+
+            foreach (ref row; neighbors)
+            {
+                foreach (ref neighbor; row)
+                {   
+                    if(neighbor.hasComponent!Agent) continue;
+                
+                    agent.energy /= 2;
+
+                    //We can't copy parent because child's genome could have references on the same storage
+                    //(if genome size > 64). Then we should set child's genome init value and copy parent's values
+                    //in it, but that's too unoptimized. Just copy genome is simpler
+                    Agent child;
+                    child.energy = agent.energy;
+                    child.flags = agent.flags;
+                    child.register = agent.register;
+                    child.genome.reserve(gat.genomeSize);
+                    child.pc = childPC;
+
+                    foreach(j; 0..gat.genomeSize)
+                    {
+                        child.genome ~= agent.genome[j];
+                    }
+                
+                    mutate(child);
+
+                    neighbor.addComponent!Agent(child);
+                    goto foreachBreak;
+                }
+            }
+            foreachBreak:
+        }
+
+        void walk()
+        {
+            // Mod by 3 because we have 3 neighbor cells at each side:
+            //
+            // 0 [0][1][2]
+            // 1 [0][x][2] <- x is object!
+            // 2 [0][1][2]
+            //
+            // Values in genome can be higher, than 2, so we using mod here.
+            int[2] position;
+            position[0] = cast(int) agent.genome[addPC(1)];
+            position[1] = cast(int) agent.genome[addPC(1)];
+
+                int[2] relativePosition;
+                relativePosition[] = position[] % 3;
+
+            SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
+
+            if(other.hasComponent!Agent())
+            {
+                return;
+            }
+            else if(other.hasComponent!Food())
+            {
+                return;
+            }
+            else if(other.hasComponent!Spike())
+            {
+                return;
+            }
+
+            map.swap(object, other);
+
+            agent.energy -= gat.walkEnergyCost;
+        }
+
+        void eat()
+        {
+            int[2] position;
+            position[0] = cast(int) agent.genome[addPC(1)];
+            position[1] = cast(int) agent.genome[addPC(1)];
+
+            int[2] relativePosition;
+            relativePosition[] = position[] % 3;
+
+            SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
+
+            pragma(inline, true)
+            void tryRemoveAndAddEnergy(T)(float energy)
+            {                        
+                if(other.hasComponent!T())
+                {
+                    other.removeComponent!T();
+                    agent.energy += energy;
+                }
+            }                    
+
+            tryRemoveAndAddEnergy!Agent(gat.cannibalismEnergy);
+            tryRemoveAndAddEnergy!Food(gat.foodEnergy);
+            tryRemoveAndAddEnergy!Spike(-gat.spikeEnergyDamage);
+        }
+
+        void look()
+        {
+            int[2] position;
+            position[0] = cast(int) agent.genome[addPC(1)];
+            position[1] = cast(int) agent.genome[addPC(1)];
+
+            int[2] relativePosition;
+            relativePosition[] = position[] % 3;
+
+            SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
+
+            if(other.hasComponent!Agent()) agent.register = LookCommandObjects.agent;
+            else if(other.hasComponent!Food()) agent.register = LookCommandObjects.food;
+            else if(other.hasComponent!Spike()) agent.register = LookCommandObjects.spike;
+            else agent.register = LookCommandObjects.agent;
+        }
+
         for(int i = 0; i < gat.maxExecutedCommands; i++)
         {
             auto instruction = agent.genome[addPC(1)];
@@ -217,39 +340,7 @@ public class AgentSystem : ObjectSystem!Agent
                     return;
 
                 case Instruction.walk:
-                    // Mod by 3 because we have 3 neighbor cells at each side:
-                    //
-                    // 0 [0][1][2]
-                    // 1 [0][x][2] <- x is object!
-                    // 2 [0][1][2]
-                    //
-                    // Values in genome can be higher, than 2, so we using mod here.
-                    int[2] position;
-                    position[0] = cast(int) agent.genome[addPC(1)];
-                    position[1] = cast(int) agent.genome[addPC(1)];
-
-                    int[2] relativePosition;
-                    relativePosition[] = position[] % 3;
-
-                    SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
-
-                    if(other.hasComponent!Agent())
-                    {
-                        return;
-                    }
-                    else if(other.hasComponent!Food())
-                    {
-                        return;
-                    }
-                    else if(other.hasComponent!Spike())
-                    {
-                        return;
-                    }
-
-                    map.swap(object, other);
-
-                    agent.energy -= gat.walkEnergyCost;
-
+                    walk();
                     // Made movement == our turn is over.
                     return;
 
@@ -261,40 +352,7 @@ public class AgentSystem : ObjectSystem!Agent
                     boundPC();
                     break;
                 case Instruction.divide:
-                    NumericInstruction childPC = agent.genome[addPC(1)];
-
-                    auto neighbors = map.getNeighbors(object);
-
-                    foreach (ref row; neighbors)
-                    {
-                        foreach (ref neighbor; row)
-                        {   
-                            if(neighbor.hasComponent!Agent) continue;
-                        
-                            agent.energy /= 2;
-
-                            //We can't copy parent because child's genome could have references on the same storage
-                            //(if genome size > 64). Then we should set child's genome init value and copy parent's values
-                            //in it, but that's too unoptimized. Just copy genome is simpler
-                            Agent child;
-                            child.energy = agent.energy;
-                            child.flags = agent.flags;
-                            child.register = agent.register;
-                            child.genome.reserve(gat.genomeSize);
-                            child.pc = childPC;
-
-                            foreach(j; 0..gat.genomeSize)
-                            {
-                               child.genome ~= agent.genome[j];
-                            }
-                            
-                            mutate(child);
-
-                            neighbor.addComponent!Agent(child);
-                            goto foreachBreak;
-                        }
-                    }
-                    foreachBreak:
+                    divide();
                     return;
 
                 case Instruction.apoptose:
@@ -308,28 +366,7 @@ public class AgentSystem : ObjectSystem!Agent
                     break;
                 
                 case Instruction.eat:
-                    int[2] position;
-                    position[0] = cast(int) agent.genome[addPC(1)];
-                    position[1] = cast(int) agent.genome[addPC(1)];
-
-                    int[2] relativePosition;
-                    relativePosition[] = position[] % 3;
-
-                    SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
-
-                    pragma(inline, true)
-                    void tryRemoveAndAddEnergy(T)(float energy)
-                    {                        
-                        if(other.hasComponent!T())
-                        {
-                            other.removeComponent!T();
-                            agent.energy += energy;
-                        }
-                    }                    
-
-                    tryRemoveAndAddEnergy!Agent(gat.cannibalismEnergy);
-                    tryRemoveAndAddEnergy!Food(gat.foodEnergy);
-                    tryRemoveAndAddEnergy!Spike(-gat.spikeEnergyDamage);
+                    eat();
                     return;
                 
                 case Instruction.compare:
@@ -380,20 +417,7 @@ public class AgentSystem : ObjectSystem!Agent
                     break;
 
                 case Instruction.look:
-                    int[2] position;
-                    position[0] = cast(int) agent.genome[addPC(1)];
-                    position[1] = cast(int) agent.genome[addPC(1)];
-
-                    int[2] relativePosition;
-                    relativePosition[] = position[] % 3;
-
-                    SimObject other = map.getNeighbors(object)[relativePosition[1]][relativePosition[0]];
-
-                    if(other.hasComponent!Agent()) agent.register = LookCommandObjects.agent;
-                    else if(other.hasComponent!Food()) agent.register = LookCommandObjects.food;
-                    else if(other.hasComponent!Spike()) agent.register = LookCommandObjects.spike;
-                    else agent.register = LookCommandObjects.agent;
-
+                    look();
                     break;
 
                 default:
