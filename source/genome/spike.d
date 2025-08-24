@@ -20,7 +20,7 @@ public class SpawnSpikeSystem : BaseSystem
 
     public override void update()
     {
-        for(int y = 0; y < gsic.xMapSize; y++)
+        for(int y = 0; y < gsic.yMapSize; y++)
         {
             for (int x = 0; x < gsic.xMapSize; x++)
             {

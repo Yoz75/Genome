@@ -23,7 +23,7 @@ public struct Simulation
         {
             map.initMe();
             shouldRestart = false;
-            for(int i = 0; i < gsic.xMapSize; i++)
+            for(int i = 0; i < gsic.yMapSize; i++)
             {
                 for(int j = 0; j < gsic.xMapSize; j++)
                 {
