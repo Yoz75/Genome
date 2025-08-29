@@ -16,7 +16,7 @@ ConfigManager configManager;
 /// Params:
 ///   prompt = text prompt
 /// Returns: read data
-private T ReadWithPrompt(T)(dstring prompt)
+private T readWithPrompt(T)(dstring prompt)
 {
 	import std.string;
 	import std.array;
@@ -29,9 +29,9 @@ private T ReadWithPrompt(T)(dstring prompt)
 ///   prompt = text prompt
 ///   yesAnswer = user "yes" answer
 /// Returns: true if user answered yesAnswer, false in other case
-private bool AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, dstring yesAnswer = "y"d)
+private bool askAboutEditConfig(TConfig, alias configInstance)(dstring prompt, dstring yesAnswer = "y"d)
 {
-    bool wantRedactConfig = ReadWithPrompt!dstring(prompt) == yesAnswer;
+    bool wantRedactConfig = readWithPrompt!dstring(prompt) == yesAnswer;
     if(!wantRedactConfig) return false;
     
     import std.traits : hasUDA, getUDAs;
@@ -51,9 +51,11 @@ private bool AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, d
                 enum description = attrs[0].Description;
 
                 alias FieldType = Fields!TConfig[i];
-                auto promptMsg = "Enter value for "~name~" ("~description~"):";
-                auto value = ReadWithPrompt!FieldType(promptMsg);
-                __traits(getMember, configInstance, name) = value;
+                auto promptMsg = "Enter value for "~name~" ("~description~") or skip with new line:";
+                auto rawValue = readWithPrompt!dstring(promptMsg);
+
+                if(rawValue != "")                
+                    __traits(getMember, configInstance, name) = to!FieldType(rawValue);
             }
         }
     }    
@@ -66,10 +68,10 @@ private bool AskAboutEditConfig(TConfig, alias configInstance)(dstring prompt, d
 ///   filePath = save file path
 ///   prompt = text prompt
 ///   yesAnswer = user "yes" answer
-private static void AskAboutSaveConfig(TConfig, alias configInstance)
+private static void askAboutSaveConfig(TConfig, alias configInstance)
 (string filePath, dstring prompt, dstring yesAnswer = "y"d)
 {
-    bool wantSaveConfig = ReadWithPrompt!dstring(prompt) == yesAnswer;
+    bool wantSaveConfig = readWithPrompt!dstring(prompt) == yesAnswer;
     if(!wantSaveConfig) return;
     writeJSON!TConfig(filePath, configInstance);
 }
@@ -88,28 +90,28 @@ public struct ConfigManager
     {
         cwriteln("Genome config manager".color(fg.yellow));
 
-        LoadConfigWithFeedback!(SpawnConfig, gsc)(spawnConfigPath);
-        LoadConfigWithFeedback!(AgentConfig, gat)(agentConfigPath);
-        LoadConfigWithFeedback!(SimulationConfig, gsic)(simulationConfigPath);
+        loadConfigWithFeedback!(SpawnConfig, gsc)(spawnConfigPath);
+        loadConfigWithFeedback!(AgentConfig, gat)(agentConfigPath);
+        loadConfigWithFeedback!(SimulationConfig, gsic)(simulationConfigPath);
 
-        if(AskAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)"))
-            AskAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
+        if(askAboutEditConfig!(SpawnConfig, gsc)("Do you want to edit spawn config? (y/n)"))
+            askAboutSaveConfig!(SpawnConfig, gsc)(spawnConfigPath, "Do you want to save config? (y/n)");
 
-        if(AskAboutEditConfig!(AgentConfig, gat)("Do you want to edit agent config? (y/n)"))
-            AskAboutSaveConfig!(AgentConfig, gat)(agentConfigPath, "Do you want to save config? (y/n)");
+        if(askAboutEditConfig!(AgentConfig, gat)("Do you want to edit agent config? (y/n)"))
+            askAboutSaveConfig!(AgentConfig, gat)(agentConfigPath, "Do you want to save config? (y/n)");
 
-        if(AskAboutEditConfig!(SimulationConfig, gsic)("Do you want to edit simulation config? (y/n)"))
-            AskAboutSaveConfig!(SimulationConfig, gsic)(simulationConfigPath, "Do you want to save config? (y/n)");
+        if(askAboutEditConfig!(SimulationConfig, gsic)("Do you want to edit simulation config? (y/n)"))
+            askAboutSaveConfig!(SimulationConfig, gsic)(simulationConfigPath, "Do you want to save config? (y/n)");
     }
 
     public void updateConfigs()
     {
-        TryLoadConfig!(SpawnConfig, gsc)(spawnConfigPath);
-        TryLoadConfig!(AgentConfig, gat)(agentConfigPath);
-        TryLoadConfig!(SimulationConfig, gsic)(simulationConfigPath);
+        tryLoadConfig!(SpawnConfig, gsc)(spawnConfigPath);
+        tryLoadConfig!(AgentConfig, gat)(agentConfigPath);
+        tryLoadConfig!(SimulationConfig, gsic)(simulationConfigPath);
     }
 
-    private bool TryLoadConfig(TConfig, alias configInstance)(string filePath)
+    private bool tryLoadConfig(TConfig, alias configInstance)(string filePath)
     {
         if (exists(configsPath) && isDir(configsPath))
         {
@@ -131,12 +133,12 @@ public struct ConfigManager
         return true;
     }
 
-    private void LoadConfigWithFeedback(TConfig, alias configInstance)(string filePath)
+    private void loadConfigWithFeedback(TConfig, alias configInstance)(string filePath)
     {
         enum successLoadMessage = "Config loaded successfully.";
         enum loadErrorMessage = "Could not load config. Using default settings.";
 
-        bool couldLoadConfig = TryLoadConfig!(TConfig, configInstance)(filePath);
+        bool couldLoadConfig = tryLoadConfig!(TConfig, configInstance)(filePath);
 
         if(!couldLoadConfig) cwriteln((loadErrorMessage ~ " " ~ filePath).color(fg.red));        
         else cwriteln(successLoadMessage.color(fg.green));
