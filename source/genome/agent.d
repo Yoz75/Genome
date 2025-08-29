@@ -176,6 +176,8 @@ public class AgentSystem : ObjectSystem!Agent
 
     private void mutate(ref Agent agent)
     {
+        if(uniform01() > gat.mutationChance) return; 
+
         int mutationsCount = uniform!"[]"(gat.minMutationsCount, gat.maxMutationsCount);
 
         foreach (mutation; 0..mutationsCount)

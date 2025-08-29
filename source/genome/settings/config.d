@@ -46,8 +46,9 @@ public:
     @AskUser("how many instructions in agent's genome?"d) int genomeSize = 64;
     @AskUser("maximal instruction's value. Use -1 to use only instructions"d) int maxInstructionValue = 64;
     @AskUser("maximal executed commands per frame"d) int maxExecutedCommands = 2;
-    @AskUser("minimal count of genome mutations"d) int minMutationsCount = 0;
-    @AskUser("maximal count of genome mutations"d) int maxMutationsCount = 5;
+    @AskUser("chance of genome's mutation when divide"d) float mutationChance = 0.05;
+    @AskUser("minimal count of changed genes (\"strength\" of mutation)"d) int minMutationsCount = 1;
+    @AskUser("maximal count of genome mutations (\"strength\" of mutation)"d) int maxMutationsCount = 16;
 }
 
 /// Other settings
