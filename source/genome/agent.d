@@ -125,7 +125,7 @@ public class SpawnAgentSystem : BaseSystem
                         agent.genome ~= cast(Instruction) raw;
                     }
 
-                    agent.energy = gat.baseEnergy;
+                    agent.energy = gat.maxEnergy;
 
                     object.addComponent!Agent(agent);
                 }
@@ -165,6 +165,10 @@ public class AgentSystem : ObjectSystem!Agent
         {
             object.removeComponent!Agent();
             return;
+        }
+        else if(agent.energy >= gat.maxEnergy)
+        {
+            agent.energy = gat.maxEnergy;
         }
 
         executeGenome(agent, object);

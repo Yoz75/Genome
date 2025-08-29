@@ -34,7 +34,7 @@ struct AgentConfig
     mixin JsonizeMe;
 @jsonize:
 public:
-    @AskUser("energy of agents at start of simulation"d) float baseEnergy = 100;
+    @AskUser("maximal energy of an agent"d) float maxEnergy = 100;
 
     @AskUser("cost of walking"d) float walkEnergyCost = 1;
 
