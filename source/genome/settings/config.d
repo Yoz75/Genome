@@ -57,7 +57,7 @@ struct SimulationConfig
 @jsonize:
     @AskUser("x map size"d) int xMapSize = 512;
     @AskUser("y map size"d) int yMapSize = 512;
-    @AskUser("zoom sensetivity") float zoomSensetivity = 1.5;
+    @AskUser("zoom sensetivity"d) float zoomSensetivity = 1.5;
 }
 
 enum RenderMode
