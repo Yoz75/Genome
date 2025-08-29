@@ -78,7 +78,7 @@ struct Renderer
     public void update()
     {
         enum float totalZoomMultiplier = 0.075;
-        enum float addZoom = 0.035;
+        enum float addZoom = 0.05;
         enum float minimalZoom = 0.1;
         
         float wheel = GetMouseWheelMove();
@@ -88,22 +88,22 @@ struct Renderer
             camera.offset = GetMousePosition();
             camera.target = mouseWorldPos;
             
-            float zoom = wheel * totalZoomMultiplier;
+            float zoom = wheel * totalZoomMultiplier * gsic.zoomSensetivity;
 
             requestedZoom += zoom;            
         }
 
         if(requestedZoom > 0)
         {
-            requestedZoom -= addZoom;
-            camera.zoom += addZoom;
+            requestedZoom -= addZoom * gsic.zoomSensetivity;
+            camera.zoom += addZoom * gsic.zoomSensetivity;
 
             if(requestedZoom - addZoom < 0) requestedZoom = 0;
         }
         else if(requestedZoom < 0)
         {
-            requestedZoom += addZoom;
-            camera.zoom -= addZoom;
+            requestedZoom += addZoom * gsic.zoomSensetivity;
+            camera.zoom -= addZoom * gsic.zoomSensetivity;
 
             if(requestedZoom + addZoom > 0) requestedZoom = 0;
         }
