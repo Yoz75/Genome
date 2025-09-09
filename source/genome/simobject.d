@@ -15,9 +15,9 @@ alias onRemoveAction = void delegate(SimObject entity);
 public struct ComponentPool(T)
 {
     public static ComponentPool!T instance;
-    private T[] data;
+    private T[][] data;
     //is entity [i] has this component or not?
-    private BitArray entitiesHasTable;
+    private BitArray[] entitiesHasTable;
 
     private onRemoveAction[] onRemoveDelegates;
 
@@ -29,9 +29,10 @@ public struct ComponentPool(T)
     {
         tryExtendData(entity);
 
-        data[entity.id] = value;
-        entitiesHasTable[entity.id] = true;
+        data[entity.world.id][entity.id] = value;
+        entitiesHasTable[entity.world.id][entity.id] = true;
     }
+
 
     /// Remove component from entity. If entity already doesn't have this component, nothing will happen
     /// Params:
@@ -39,8 +40,8 @@ public struct ComponentPool(T)
     public void removeComponent(SimObject entity)
     {
         tryExtendData(entity);
-        data[entity.id] = T.init;
-        entitiesHasTable[entity.id] = false;
+        data[entity.world.id][entity.id] = T.init;
+        entitiesHasTable[entity.world.id][entity.id] = false;
 
         foreach (onRemove; onRemoveDelegates)
         {
@@ -61,13 +62,13 @@ public struct ComponentPool(T)
     {
         tryExtendData(entity);
 
-        return data[entity.id];
+        return data[entity.world.id][entity.id];
     }
 
     public bool hasComponent(SimObject entity)
     {
         tryExtendData(entity);
-        return entitiesHasTable[entity.id];
+        return entitiesHasTable[entity.world.id][entity.id];
     }
 
     /// Try to extend data and has table if they are too short
@@ -77,13 +78,25 @@ public struct ComponentPool(T)
     pragma(inline, true)
     private void tryExtendData(SimObject entity)
     {
-        if (entity.id >= entitiesHasTable.length)
+        if (entity.world.id >= entitiesHasTable.length)
         {
-            entitiesHasTable.length = entity.id + 1;
+            entitiesHasTable.length = entity.world.id + 1;
         }
-        if (entity.id >= data.length)
+        if (entity.world.id >= data.length)
         {
-            data.length = entity.id + 1;
+            data.length = entity.world.id + 1;
+        }
+
+        ref BitArray worldHasTable = entitiesHasTable[entity.world.id];
+        ref T[] worldDataTable = data[entity.world.id];
+
+        if (entity.id >= worldHasTable.length)
+        {
+            entitiesHasTable[entity.world.id].length = entity.id + 1;
+        }
+        if (entity.id >= worldDataTable.length)
+        {
+            data[entity.world.id].length = entity.id + 1;
         }
     }
 }
@@ -93,8 +106,16 @@ public struct SimObject
 {
     /// Identificator, used for components
     public Id id;
+    /// Object's world
+    public World* world;
+
     /// Object position
-    public int[2] position;    
+    public int[2] position; 
+
+    public static SimObject create(World* world)
+    {
+        return SimObject(world.totalEntities_++, world);
+    }   
 
 pragma(inline, true):
     /// Shortcut for ComponentPool!T.addComponent. See ComponentPool.addComponent
@@ -262,4 +283,21 @@ public abstract class ObjectSystem(T) : System!(T)
     }
 
     protected abstract void updateObject(ref T component, SimObject object);
+}
+
+public struct World
+{
+    public static World create()
+    {
+        static Id lastId;
+
+        return World(lastId++);
+    }
+
+    // private, but everything is public within a single module
+    private size_t totalEntities_;
+    private Id id_;
+
+    public @property size_t totalEntities() => totalEntities_;
+    public @property Id id() => id_;
 }

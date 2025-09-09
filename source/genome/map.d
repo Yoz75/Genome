@@ -10,6 +10,9 @@ Map map;
 public struct Map
 {
     private SimObject[][] field;
+    private SimObject[][] tempField;
+
+    private World fieldWorld, tempFieldWorld;
 
     /// Get object at specific position
     /// Params:
@@ -49,16 +52,30 @@ public struct Map
     /// Init map
     public void initMe()
     {
-        map.field = new SimObject[][gsic.yMapSize];
-        int i = 0;
-        foreach (y, ref col; map.field)
+        fieldWorld = World.create();
+        tempFieldWorld = World.create();
+
+        field = new SimObject[][gsic.yMapSize];
+
+        foreach(y, ref col; field)
         {
             col = new SimObject[gsic.xMapSize];
-            foreach (x, ref object; col)
+            foreach(x, ref object; col)
             {
-                object.id = i;
+                object = SimObject.create(&fieldWorld);
                 object.position = [cast(int) x, cast(int) y];
-                i++;
+            }
+        }
+
+        tempField = new SimObject[][gsic.yMapSize];
+
+        foreach(y, ref col; tempField)
+        {
+            col = new SimObject[gsic.xMapSize];
+            foreach(x, ref object; col)
+            {
+                object = SimObject.create(&tempFieldWorld);
+                object.position = [cast(int) x, cast(int) y];
             }
         }
     }
@@ -75,8 +92,27 @@ public struct Map
         a.position = posB;
         b.position = posA;
 
-        field[posA[1]][posA[0]] = b;
-        field[posB[1]][posB[0]] = a;
+        tempField[posA[1]][posA[0]] = b;
+        tempField[posB[1]][posB[0]] = a;
+    }
+
+    public void updateFields()
+    {
+        /*
+            we "juggle" with fields, then copy new field's values into temp field 
+            (this shit is done to avoid GC allocations of new array)
+        */
+        auto temp = field;
+        field = tempField;
+        tempField = temp;
+
+        foreach (y, col; tempField)
+        {
+            foreach(x, ref object; col)
+            {
+                object = field[y][x];
+            }
+        }
     }
 
     pragma(inline, true)

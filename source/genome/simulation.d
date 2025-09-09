@@ -61,6 +61,8 @@ public struct Simulation
         }
 
         renderer.update();
+
+        map.updateFields();
     }    
 
 
