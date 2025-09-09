@@ -11,7 +11,7 @@ public class UpdateConfigSystem : BaseSystem
     
     public override void update()
     {
-        if(!Input.IsKeyDown(Keys.q)) return;
+        if(!Input.isKeyDown(Keys.q)) return;
 
         configManager.updateConfigs();
     }
@@ -24,7 +24,7 @@ public class RestartSimulationSystem : BaseSystem
 
     public override void update()
     {
-        if(!Input.IsKeyDown(Keys.r)) return;
+        if(!Input.isKeyDown(Keys.r)) return;
 
         simulation.restart();
     }
@@ -39,7 +39,7 @@ public class ExitSimulationSystem : BaseSystem
     {
         import core.stdc.stdlib : exit;
 
-        if(!Input.IsKeyDown(Keys.escape)) return;
+        if(!Input.isKeyDown(Keys.escape)) return;
 
         exit(0);
     }

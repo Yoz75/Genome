@@ -111,10 +111,10 @@ struct Renderer
         if (camera.zoom < minimalZoom) camera.zoom = minimalZoom;
 
         immutable float moveSpeed = 100.0f * GetFrameTime() / camera.zoom;
-        if (Input.IsKeyDown(Keys.w)) camera.target.y -= moveSpeed;
-        if (Input.IsKeyDown(Keys.s)) camera.target.y += moveSpeed;
-        if (Input.IsKeyDown(Keys.a)) camera.target.x -= moveSpeed;
-        if (Input.IsKeyDown(Keys.d)) camera.target.x += moveSpeed;
+        if (Input.isKeyDown(Keys.w)) camera.target.y -= moveSpeed;
+        if (Input.isKeyDown(Keys.s)) camera.target.y += moveSpeed;
+        if (Input.isKeyDown(Keys.a)) camera.target.x -= moveSpeed;
+        if (Input.isKeyDown(Keys.d)) camera.target.x += moveSpeed;
 
         BeginDrawing();
         ClearBackground(Colors.BLACK);

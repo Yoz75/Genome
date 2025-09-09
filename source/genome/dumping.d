@@ -21,7 +21,7 @@ public class DumpSystem : BaseSystem
 
     public override void update()
     {
-        if(!Input.IsKeyDown(Keys.t)) return;
+        if(!Input.isKeyDown(Keys.t)) return;
 
         auto stringBuilder = appender!string;
         string dumbContent;

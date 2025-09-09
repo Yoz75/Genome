@@ -56,7 +56,7 @@ public struct Input
 public:
 static:
     /// Was key pressed this frame?
-    bool IsKeyDown(Keys key)
+    bool isKeyDown(Keys key)
     {
         return raylib.IsKeyDown(key);
     }
