@@ -2,7 +2,7 @@
 	"fileVersion": 1,
 	"versions": {
 		"colorize": "1.0.5",
-		"dlib": "1.3.2",
+		"dlib": "1.3.3",
 		"jsonizer": "0.7.7",
 		"raylib-d": "5.5.1"
 	}
