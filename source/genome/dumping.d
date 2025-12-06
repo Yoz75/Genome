@@ -39,10 +39,20 @@ public class DumpSystem : BaseSystem
                 {                
                     stringBuilder.put("№");
                     stringBuilder.put(to!string(j));
+
                     stringBuilder.put(" ");
                     stringBuilder.put(to!string(instruction));
+
                     stringBuilder.put(" ");
                     stringBuilder.put(to!size_t(instruction).to!string);
+
+                    // Show current executing instruction of agent
+                    if(agent.pc == j)
+                    {
+                        stringBuilder.put(" ");
+                        stringBuilder.put("<");
+                    }
+
                     stringBuilder.put("\n");
                 }
 
